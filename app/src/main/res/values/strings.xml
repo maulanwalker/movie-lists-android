@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Movie Lists</string>
-    <string name="movie1">I am strong.</string>
-    <string name="movie2">I believe in myself.</string>
+    <string name="movie1">Barbie.</string>
+    <string name="movie2">Meg 3.</string>
     <string name="movie3">Oppenheimer.</string>
 </resources>
