@@ -18,27 +18,17 @@ class MovieAdapter(
         val imageView: ImageView = view.findViewById(R.id.movie_image)
     }
 
-    /**
-     * Create new views (invoked by the layout manager)
-     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
-        // create a new view
         val adapterLayout = LayoutInflater.from(parent.context)
             .inflate(R.layout.list_movie, parent, false)
 
         return MovieViewHolder(adapterLayout)
     }
 
-    /**
-     * Replace the contents of a view (invoked by the layout manager)
-     */
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = dataset[position]
         holder.imageView.setImageResource(movie.movieImage)
     }
 
-    /**
-     * Return the size of your dataset (invoked by the layout manager)
-     */
     override fun getItemCount() = dataset.size
 }
