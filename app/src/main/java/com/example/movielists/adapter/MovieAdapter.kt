@@ -14,8 +14,17 @@ class MovieAdapter(
     private val dataset: List<Movie>
 ) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
+    private var filteredList : List<Movie> = dataset.toList()
+
     class MovieViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-        val imageView: ImageView = view.findViewById(R.id.movie_image)
+        var imageView : ImageView = view.findViewById(R.id.movie_image)
+    }
+
+    fun filter(query: String) {
+        filteredList = dataset.filter { movie ->
+            context.resources.getString(movie.movieName).contains(query, true)
+        }
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
@@ -26,9 +35,9 @@ class MovieAdapter(
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        val movie = dataset[position]
+        val movie = filteredList[position]
         holder.imageView.setImageResource(movie.movieImage)
     }
 
-    override fun getItemCount() = dataset.size
+    override fun getItemCount() = filteredList.size
 }
