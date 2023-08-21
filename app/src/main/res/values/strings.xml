@@ -3,4 +3,6 @@
     <string name="movie1">Meg 2.</string>
     <string name="movie2">Barbie.</string>
     <string name="movie3">Oppenheimer.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

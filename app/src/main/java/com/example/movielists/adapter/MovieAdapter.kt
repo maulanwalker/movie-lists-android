@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.movielists.R
 import com.example.movielists.model.Movie
 
-class MovieAdapter(
+class MovieAdapter( 
     private val context: Context,
     private val dataset: List<Movie>
 ) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
