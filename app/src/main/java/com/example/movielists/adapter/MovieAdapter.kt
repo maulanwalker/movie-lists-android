@@ -1,11 +1,14 @@
 package com.example.movielists.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.example.movielists.MovieListFragmentDirections
 import com.example.movielists.R
 import com.example.movielists.model.Movie
 
@@ -16,13 +19,14 @@ class MovieAdapter(
 
     private var filteredList : List<Movie> = dataset.toList()
 
-    class MovieViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    class MovieViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         var imageView : ImageView = view.findViewById(R.id.movie_image)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun filter(query: String) {
         filteredList = dataset.filter { movie ->
-            context.resources.getString(movie.movieName).contains(query, true)
+            context.resources.getString(movie.movieTitle).contains(query, true)
         }
         notifyDataSetChanged()
     }
@@ -37,6 +41,11 @@ class MovieAdapter(
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = filteredList[position]
         holder.imageView.setImageResource(movie.movieImage)
+        holder.imageView.setOnClickListener{
+            val action = MovieListFragmentDirections
+                .actionMovieListFragmentToMovieDetailFragment(movie.movieImage.toString())
+            holder.view.findNavController().navigate(action)
+        }
     }
 
     override fun getItemCount() = filteredList.size

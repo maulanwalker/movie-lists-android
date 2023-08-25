@@ -10,13 +10,5 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-
-        val movieListFragment = MovieListFragment()
-        fragmentTransaction
-            .add(binding.container.id, movieListFragment, MovieListFragment::class.java.simpleName)
-            .commit()
     }
 }
