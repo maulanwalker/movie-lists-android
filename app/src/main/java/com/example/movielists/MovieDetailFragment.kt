@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import com.example.movielists.data.Datasource
 import com.example.movielists.databinding.FragmentMovieDetailBinding
 import com.example.movielists.model.Movie
@@ -36,9 +37,16 @@ class MovieDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val image = binding.movieImage
         val title = binding.movieTitle
+        val button = binding.youtubePlayerButton
 
         image.setImageResource(imageID.toInt())
         title.text = movie.movieTitle.let { context?.resources?.getText(movie.movieTitle) }.toString()
+
+        button.setOnClickListener {
+            val action = MovieDetailFragmentDirections
+                .actionMovieDetailFragmentToYoutubePlayerFragment(movie.movieYoutubeTrailerID)
+            button.findNavController().navigate(action)
+        }
     }
 
     override fun onDestroyView() {
