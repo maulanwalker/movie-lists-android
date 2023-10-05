@@ -15,6 +15,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Ful
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
+@Suppress("DEPRECATION")
 class YoutubePlayerFragment : Fragment() {
     private var _binding : FragmentYoutubePlayerBinding? = null
     private val binding get() = _binding!!
@@ -29,6 +30,7 @@ class YoutubePlayerFragment : Fragment() {
         arguments?.let {
             youtubeID = it.getString("id_youtube").toString()
         }
+        retainInstance = true
     }
 
     override fun onCreateView(
@@ -44,6 +46,7 @@ class YoutubePlayerFragment : Fragment() {
         videoPlayer = binding.videoPlayer
         fullscreenViewContainer = binding.fullScreenViewContainer
 
+        lifecycle.addObserver(videoPlayer)
         val iFramePlayerOptions = IFramePlayerOptions.Builder()
             .controls(1).fullscreen(1).build()
 

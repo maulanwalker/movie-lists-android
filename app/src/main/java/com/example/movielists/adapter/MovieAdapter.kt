@@ -1,52 +1,46 @@
 package com.example.movielists.adapter
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movielists.MovieListFragmentDirections
-import com.example.movielists.R
-import com.example.movielists.model.Movie
+import com.example.movielists.databinding.ListMovieBinding
+import com.example.movielists.response.ResultItem
 
-class MovieAdapter( 
-    private val context: Context,
-    private val dataset: List<Movie>
-) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+class MovieAdapter : ListAdapter<ResultItem, MovieAdapter.MovieViewHolder>(DIFF_CALLBACK) {
 
-    private var filteredList : List<Movie> = dataset.toList()
-
-    class MovieViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        var imageView : ImageView = view.findViewById(R.id.movie_image)
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun filter(query: String) {
-        filteredList = dataset.filter { movie ->
-            context.resources.getString(movie.movieTitle).contains(query, true)
+    class MovieViewHolder(private val binding: ListMovieBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(movie: ResultItem){
+            binding.photo = movie
+            binding.movieImage.setOnClickListener {
+                val action = MovieListFragmentDirections
+                    .actionMovieListFragmentToMovieDetailFragment(idImage = movie.id)
+                binding.movieImage.findNavController().navigate(action)
+            }
+            binding.executePendingBindings()
         }
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
-        val adapterLayout = LayoutInflater.from(parent.context)
-            .inflate(R.layout.list_movie, parent, false)
-
-        return MovieViewHolder(adapterLayout)
+        val binding = ListMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return MovieViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        val movie = filteredList[position]
-        holder.imageView.setImageResource(movie.movieImage)
-        holder.imageView.setOnClickListener{
-            val action = MovieListFragmentDirections
-                .actionMovieListFragmentToMovieDetailFragment(movie.movieImage.toString())
-            holder.view.findNavController().navigate(action)
+        val movie = getItem(position)
+        holder.bind(movie)
+    }
+    companion object {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ResultItem>() {
+            override fun areItemsTheSame(oldItem: ResultItem, newItem: ResultItem): Boolean {
+                return oldItem == newItem
+            }
+            override fun areContentsTheSame(oldItem: ResultItem, newItem: ResultItem): Boolean {
+                return oldItem == newItem
+            }
         }
     }
-
-    override fun getItemCount() = filteredList.size
 }
