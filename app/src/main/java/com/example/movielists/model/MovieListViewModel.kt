@@ -1,15 +1,14 @@
 package com.example.movielists.model
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.movielists.response.MovieListResponse
+import androidx.lifecycle.viewModelScope
 import com.example.movielists.response.ResultItem
-import com.example.movielists.retrofit.ApiConfig
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.movielists.retrofit.MovieListApi
+import kotlinx.coroutines.launch
+
+enum class MovieListApiStatus { LOADING, ERROR, DONE }
 
 class MovieListViewModel : ViewModel() {
     var tempMovies : List<ResultItem> = listOf()
@@ -21,6 +20,9 @@ class MovieListViewModel : ViewModel() {
 
     private val _movie = MutableLiveData<ResultItem>()
     val movie: LiveData<ResultItem> = _movie
+
+    private val _status = MutableLiveData<MovieListApiStatus>()
+    val status: LiveData<MovieListApiStatus> = _status
 
     init {
         getData()
@@ -48,26 +50,37 @@ class MovieListViewModel : ViewModel() {
     }
 
     private fun getData() {
-        val client = ApiConfig.getApiService().getMovies()
-        client.enqueue(object : Callback<MovieListResponse> {
-            override fun onResponse(
-                call: Call<MovieListResponse>,
-                response: Response<MovieListResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        tempMovies = responseBody.result
-                        _movies.value = tempMovies
-                    }
-                } else {
-                    Log.e("TAG", "onFailure: ${response.message()}")
-                }
+        viewModelScope.launch {
+            _status.value = MovieListApiStatus.LOADING
+            try {
+                tempMovies = MovieListApi.retrofitService.getMovies()
+                _movies.value = tempMovies
+//                val client = ApiConfig.getApiService().getMovies()
+//                client.enqueue(object : Callback<MovieListResponse> {
+//                    override fun onResponse(
+//                        call: Call<MovieListResponse>,
+//                        response: Response<MovieListResponse>
+//                    ) {
+//                        if (response.isSuccessful) {
+//                            val responseBody = response.body()
+//                            if (responseBody != null) {
+//                                tempMovies = responseBody.result
+//                                _movies.value = tempMovies
+//                            }
+//                        } else {
+//                            Log.e("TAG", "onFailure: ${response.message()}")
+//                        }
+//                    }
+//                    override fun onFailure(call: Call<MovieListResponse>, t: Throwable) {
+//                        Log.e("TAG", "onFailure: ${t.message}")
+//                    }
+//                })
+                _status.value = MovieListApiStatus.DONE
+            } catch (e: Exception) {
+                _status.value = MovieListApiStatus.ERROR
+                _movies.value = listOf()
             }
-            override fun onFailure(call: Call<MovieListResponse>, t: Throwable) {
-                Log.e("TAG", "onFailure: ${t.message}")
-            }
-        })
+        }
     }
 
     fun getDetailData(imageID: String) {

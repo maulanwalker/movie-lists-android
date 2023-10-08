@@ -1,21 +1,21 @@
 package com.example.movielists.response
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
-data class MovieListResponse(
-
-	@field:SerializedName("result")
-	val result: List<ResultItem>
-)
+//data class MovieListResponse(
+//
+//	@field:SerializedName("result")
+//	val result: List<ResultItem>
+//)
 
 data class ResultItem(
 
-	@field:SerializedName("imageLink")
+	@Json(name="imageLink")
 	val imageLink: String,
 
-	@field:SerializedName("id")
+	@Json(name="id")
 	val id: String,
 
-	@field:SerializedName("title")
+	@Json(name="title")
 	val title: String
 )
