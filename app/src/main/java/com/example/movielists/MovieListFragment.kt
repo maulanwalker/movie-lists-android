@@ -7,13 +7,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import com.example.movielists.adapter.MovieAdapter
 import com.example.movielists.databinding.FragmentMovieListBinding
 import com.example.movielists.model.MovieListViewModel
 
 class MovieListFragment : Fragment() {
-    private val sharedViewModel: MovieListViewModel by activityViewModels()
+    private val viewModel: MovieListViewModel by lazy {
+        val activity = requireNotNull(this.activity) {
+            "You can only access the viewModel after onActivityCreated()"
+        }
+        ViewModelProvider(this, MovieListViewModel.Factory(activity.application))
+            .get(MovieListViewModel::class.java)
+    }
+
+//    private val sharedViewModel: MovieListViewModel by activityViewModels()
     private var _binding: FragmentMovieListBinding? = null
     private val binding get() = _binding!!
     private lateinit var searchView: SearchView
@@ -23,7 +31,7 @@ class MovieListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMovieListBinding.inflate(inflater, container, false)
-        binding.viewModel = sharedViewModel
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
         binding.recyclerView.adapter = MovieAdapter()
         val view = binding.root
@@ -36,7 +44,7 @@ class MovieListFragment : Fragment() {
             @SuppressLint("SetTextI18n")
             override fun onQueryTextSubmit(query: String?): Boolean {
                 binding.resultFilter.visibility = View.VISIBLE
-                sharedViewModel.changeTextSearch("$query")
+                viewModel.changeTextSearch("$query")
                 return true
             }
 
@@ -44,7 +52,7 @@ class MovieListFragment : Fragment() {
                 // Called when the user changes the text in the search box
                 // Handle text changes here
                 binding.resultFilter.visibility = View.GONE
-                sharedViewModel.changeTextSearch("")
+                viewModel.changeTextSearch("")
                 return true
             }
         })

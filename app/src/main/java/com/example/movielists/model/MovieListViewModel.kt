@@ -1,19 +1,28 @@
 package com.example.movielists.model
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.movielists.database.getDatabase
+import com.example.movielists.repository.MoviesRepository
 import com.example.movielists.response.ResultItem
 import com.example.movielists.retrofit.MovieListApi
 import kotlinx.coroutines.launch
 
 enum class MovieListApiStatus { LOADING, ERROR, DONE }
 
-class MovieListViewModel : ViewModel() {
+class MovieListViewModel(application: Application) : AndroidViewModel(application) {
+    private val moviesRepository = MoviesRepository(getDatabase(application))
+
+    val movies = moviesRepository.movies
+
     var tempMovies : List<ResultItem> = listOf()
     private val _movies = MutableLiveData<List<ResultItem>>()
-    val movies: LiveData<List<ResultItem>> = _movies
+//    val movies: LiveData<List<ResultItem>> = _movies
 
     private val _textSearch = MutableLiveData<String>()
     val textSearch: LiveData<String> = _textSearch
@@ -53,6 +62,7 @@ class MovieListViewModel : ViewModel() {
         viewModelScope.launch {
             _status.value = MovieListApiStatus.LOADING
             try {
+                moviesRepository.refreshVideos()
                 tempMovies = MovieListApi.retrofitService.getMovies()
                 _movies.value = tempMovies
 //                val client = ApiConfig.getApiService().getMovies()
@@ -77,8 +87,10 @@ class MovieListViewModel : ViewModel() {
 //                })
                 _status.value = MovieListApiStatus.DONE
             } catch (e: Exception) {
-                _status.value = MovieListApiStatus.ERROR
-                _movies.value = listOf()
+                if(movies.value.isNullOrEmpty())
+                    _status.value = MovieListApiStatus.ERROR
+//                _status.value = MovieListApiStatus.ERROR
+//                _movies.value = listOf()
             }
         }
     }
@@ -86,5 +98,15 @@ class MovieListViewModel : ViewModel() {
     fun getDetailData(imageID: String) {
         val result = movies.value?.find { it.id == imageID }
         _movie.value = result!!
+    }
+
+    class Factory(val app: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MovieListViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return MovieListViewModel(app) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewmodel")
+        }
     }
 }
